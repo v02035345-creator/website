@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Romantic Apology Website</title>
+
+  <style>
+    /* Global styles for a soft, romantic look */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Georgia', serif;
+      background: linear-gradient(45deg, #ffe6f0, #ffb3ba, #ffdfba);
+      background-size: 400% 400%;
+      animation: gradientShift 10s ease infinite;
+      color: #5a4a4a;
+      line-height: 1.6;
+      overflow-x: hidden;
+      min-height: 100vh;
+      position: relative;
+    }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .dark-mode {
+      background: linear-gradient(45deg, #2c1810, #4a2c2a, #3a1f1a);
+      color: #e6d7c3;
+    }
+
+    nav {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      padding: 10px 20px;
+      z-index: 1000;
+    }
+
+    nav button {
+      background: rgba(255, 255, 255, 0.85);
+      border: none;
+      padding: 10px 12px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: transform 0.2s;
+      font-size: 16px;
+    }
+
+    nav button:hover { transform: scale(1.07); }
+
+    .page {
+      display: none;
+      min-height: 100vh;
+      padding: 80px 20px 20px;
+      animation: fadeIn 0.7s ease-in-out;
+    }
+
+    .page.active { display: block; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(14px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Hero */
+    .hero {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      height: 100vh;
+      position: relative;
+    }
+
+    .hero h1 {
+      font-size: 3.2em;
+      color: #d63384;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.08);
+      min-height: 1.2em;
+    }
+
+    .hero button {
+      background: #ff6b9d;
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      font-size: 1.1em;
+      border-radius: 25px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.2s;
+      margin-top: 18px;
+    }
+
+    .hero button:hover { background: #e55b8a; transform: scale(1.04); }
+
+    .floating-hearts .heart {
+      position: absolute;
+      font-size: 1.6em;
+      color: #ff6b9d;
+      animation: float 5s ease-in-out forwards;
+      pointer-events: none;
+      opacity: 0.95;
+    }
+
+    @keyframes float {
+      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+      70% { opacity: 0.8; }
+      100% { transform: translateY(-220px) rotate(360deg); opacity: 0; }
+    }
+
+    /* Timeline */
+    .timeline { max-width: 900px; margin: 0 auto; }
+    .timeline h1 { text-align: center; margin-bottom: 20px; color: #d63384; }
+
+    .timeline-item {
+      display: flex;
+      align-items: center;
+      margin: 26px 0;
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 0.9s, transform 0.9s;
+      background: rgba(255,255,255,0.35);
+      border-radius: 14px;
+      padding: 14px;
+      backdrop-filter: blur(4px);
+    }
+
+    .dark-mode .timeline-item { background: rgba(0,0,0,0.18); }
+
+    .timeline-item.animate { opacity: 1; transform: translateY(0); }
+
+    .timeline-item img {
+      width: 220px;
+      height: 150px;
+      object-fit: cover;
+      border-radius: 10px;
+      margin-right: 18px;
+      transition: transform 0.2s;
+      flex-shrink: 0;
+    }
+
+    .timeline-item img:hover { transform: scale(1.03); }
+    .timeline-item h2 { margin-bottom: 6px; }
+
+    /* Apology */
+    .apology { max-width: 900px; margin: 0 auto; position: relative; }
+    .apology h1 { text-align: center; margin-bottom: 16px; color: #d63384; }
+
+    .letter {
+      background: rgba(255,255,255,0.45);
+      padding: 20px;
+      border-radius: 14px;
+      backdrop-filter: blur(4px);
+    }
+
+    .dark-mode .letter { background: rgba(0,0,0,0.2); }
+
+    .apology .letter p {
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+      margin-bottom: 12px;
+      font-size: 1.15em;
+    }
+
+    .apology .letter p.reveal { opacity: 1; transform: translateY(0); }
+
+    .emphasis { font-weight: bold; color: #d63384; }
+
+    .heartbeat {
+      width: 46px;
+      height: 46px;
+      background: #ff6b9d;
+      border-radius: 50%;
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      animation: heartbeat 1s infinite;
+      display: none;
+      box-shadow: 0 0 16px rgba(255,107,157,0.4);
+      z-index: 999;
+    }
+
+    @keyframes heartbeat {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.18); }
+      100% { transform: scale(1); }
+    }
+
+    /* Understanding */
+    .understanding { max-width: 900px; margin: 0 auto; text-align: center; }
+    .understanding h1 { color: #d63384; margin-bottom: 16px; }
+
+    .understanding section {
+      margin: 22px 0;
+      padding: 16px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.35);
+      backdrop-filter: blur(4px);
+      opacity: 0;
+      transform: translateY(14px);
+      transition: opacity 0.9s, transform 0.9s;
+    }
+
+    .dark-mode .understanding section { background: rgba(0,0,0,0.18); }
+    .understanding section.animate { opacity: 1; transform: translateY(0); }
+
+    .emotion-icon { font-size: 2.6em; margin-bottom: 8px; }
+
+    /* Promises */
+    .promises { max-width: 900px; margin: 0 auto; }
+    .promises h1 { text-align: center; color: #d63384; margin-bottom: 12px; }
+
+    .promises ul { list-style: none; padding: 0; }
+    .promises li {
+      margin: 14px 0;
+      font-size: 1.15em;
+      background: rgba(255,255,255,0.35);
+      border-radius: 14px;
+      padding: 12px 14px;
+      backdrop-filter: blur(4px);
+    }
+
+    .dark-mode .promises li { background: rgba(0,0,0,0.18); }
+
+    .checkmark {
+      opacity: 0;
+      transition: opacity 0.8s;
+      margin-right: 10px;
+      color: #2d8a4a;
+      font-weight: bold;
+    }
+
+    .progress-wrap {
+      background: rgba(255,255,255,0.35);
+      border-radius: 999px;
+      height: 12px;
+      overflow: hidden;
+      margin: 18px 0;
+      backdrop-filter: blur(4px);
+    }
+
+    .dark-mode .progress-wrap { background: rgba(0,0,0,0.18); }
+
+    .progress-bar {
+      width: 0%;
+      height: 100%;
+      background: #ff6b9d;
+      transition: width 1s ease;
+    }
+
+    .glow-btn {
+      background: #ff6b9d;
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      font-size: 1.1em;
+      border-radius: 25px;
+      cursor: pointer;
+      box-shadow: 0 0 12px rgba(255,107,157,0.45);
+      transition: box-shadow 0.2s, transform 0.2s;
+      margin-right: 10px;
+    }
+
+    .glow-btn:hover { box-shadow: 0 0 22px rgba(255,107,157,0.75); transform: scale(1.03); }
+
+    /* Forgiveness */
+    .forgiveness { text-align: center; max-width: 900px; margin: 0 auto; }
+    .forgiveness h1 { color: #d63384; margin-bottom: 14px; }
+
+    .heart-btn {
+      background: #ff6b9d;
+      color: white;
+      border: none;
+      padding: 18px 36px;
+      font-size: 1.3em;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .heart-btn:hover { transform: scale(1.06); }
+
+    .exploding-heart {
+      position: fixed;
+      font-size: 2em;
+      animation: explode 1.6s ease-out forwards;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    @keyframes explode {
+      0% { transform: scale(0.4); opacity: 1; }
+      100% { transform: scale(2.2); opacity: 0; }
+    }
+
+    .confetti {
+      position: fixed;
+      width: 10px;
+      height: 10px;
+      background: #ff6b9d;
+      animation: fall 2.8s ease-out forwards;
+      pointer-events: none;
+      z-index: 9998;
+      top: -12px;
+    }
+
+    @keyframes fall {
+      0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(110vh) rotate(360deg); opacity: 0.9; }
+    }
+
+    .hidden { opacity: 0; transition: opacity 0.8s; margin-top: 16px; font-size: 1.2em; }
+    .show { opacity: 1; }
+
+    /* Final */
+    .final { text-align: center; padding-top: 120px; max-width: 900px; margin: 0 auto; }
+    .final h1 { color: #d63384; margin-bottom: 10px; }
+    .final p { font-size: 1.3em; margin-bottom: 14px; }
+
+    .fade-out {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(255,255,255,0.9);
+      opacity: 0;
+      transition: opacity 2s;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* Next buttons */
+    .next-btn {
+      background: #ff6b9d;
+      color: white;
+      border: none;
+      padding: 14px 26px;
+      font-size: 1.05em;
+      border-radius: 25px;
+      cursor: pointer;
+      margin-top: 20px;
+      transition: background 0.2s, transform 0.2s;
+      display: inline-block;
+    }
+
+    .next-btn:hover { background: #e55b8a; transform: scale(1.02); }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .hero h1 { font-size: 2.4em; }
+      .timeline-item { flex-direction: column; text-align: center; }
+      .timeline-item img { margin-right: 0; margin-bottom: 10px; width: 100%; height: 180px; }
+    }
+  </style>
+</head>
+
+<body>
+  <nav aria-label="Main navigation">
+    <button id="themeToggle" aria-label="Toggle dark/light mode">🌙</button>
+    <button id="soundToggle" aria-label="Toggle sound effects" style="display:none;">🔊</button>
+  </nav>
+
+  <!-- Landing Page -->
+  <div id="landing" class="page active">
+    <main class="hero">
+      <div class="hero-content">
+        <h1 id="animatedText" aria-live="polite"></h1>
+        <button id="startBtn" aria-label="Start reading the apology">Start Reading</button>
+      </div>
+      <div class="floating-hearts" id="heartsContainer"></div>
+    </main>
+  </div>
+
+  <!-- Our Story Page -->
+  <div id="story" class="page">
+    <main class="timeline">
+      <h1>Our Story</h1>
+
+      <section class="timeline-item" data-animate>
+        <img src="image1.JPG"
+             alt="How we met" loading="lazy">
+        <div class="content">
+          <h2>How beautiful we are…</h2>
+          <p>We fight over little things, but we always find our way back to each other.
+            No matter what, we choose love and stay together. 💕</p>
+        </div>
+      </section>
+
+      <section class="timeline-item" data-animate>
+        <img src="image 2 f.JPEG"
+             alt="Best memories" loading="lazy">
+        <div class="content">
+          <h2>Best Memories</h2>
+          <p>Do you remember our first long drive together?
+            When we went to that temple and had Starbucks for the first time.
+            That day holds the most beautiful memories for me — the ones I love the most.
+            You were so happy, and seeing your smile when you took that picture made my heart fall even deeper in love with you.
+            I fell in love with you in the deepest way that day. 💖</p>
+        </div>
+      </section>
+
+      <section class="timeline-item" data-animate>
+        <img src="image3.JPG"
+             alt="I am really sorry 😔❤️‍🩹" loading="lazy">
+        <div class="content">
+          <h2>I am really sorry...</h2>
+          <p>I know I’ve made a very big mistake. I also know that I often end up doing foolish things, especially when you needed my support the most. I regret it deeply from my heart.
+
+            I’m truly sorry, my love. Please forgive me and give me one last chance. I promise I will do better and be the partner you deserve. I love you more than words can say.</p>
+        </div>
+      </section>
+
+      <button class="next-btn" data-next="apology">Continue to My Apology</button>
+    </main>
+  </div>
+
+  <!-- My Apology Page -->
+  <div id="apology" class="page">
+    <main class="apology">
+      <h1>My Apology</h1>
+
+      <div class="letter" id="letterContent">
+        <p data-reveal>My dearest love,</p>
+        <p data-reveal>Words fail me when I try to express the depth of my regret for hurting you.</p>
+        <p data-reveal class="emphasis">I cherish you more than life itself, and the pain I caused breaks my heart into pieces.</p>
+        <p data-reveal>I understand your feelings, your sadness, your disappointment, and I take full responsibility.</p>
+        <p data-reveal class="emphasis">I promise to listen, to grow, and to love you with unwavering devotion.</p>
+        <p data-reveal>You are my world, and I will spend every day making this right.</p>
+        <p data-reveal>With all my love,</p>
+        <p data-reveal>Your forever.</p>
+      </div>
+
+      <button class="next-btn" data-next="understanding">Continue</button>
+    </main>
+  </div>
+
+  <!-- Understanding Page -->
+  <div id="understanding" class="page">
+    <main class="understanding">
+      <h1>Understanding Your Feelings</h1>
+
+      <section data-animate>
+        <div class="emotion-icon">😢</div>
+        <p>I see the sadness in your eyes, and it tears me apart knowing I'm the cause.</p>
+      </section>
+
+      <section data-animate>
+        <div class="emotion-icon">💔</div>
+        <p>Your trust was broken, and I feel the weight of that betrayal deeply.</p>
+      </section>
+
+      <section data-animate>
+        <div class="emotion-icon">🤗</div>
+        <p>I'm here to rebuild that trust, one step at a time, with empathy and care.</p>
+      </section>
+
+      <button class="next-btn" data-next="promise">Continue to My Promises</button>
+    </main>
+  </div>
+
+  <!-- Promise Page -->
+  <div id="promise" class="page">
+    <main class="promises">
+      <h1>My Promises</h1>
+
+      <ul>
+        <li data-check><span class="checkmark">✔</span> I will communicate openly and honestly.</li>
+        <li data-check><span class="checkmark">✔</span> I will prioritize your feelings and needs.</li>
+        <li data-check><span class="checkmark">✔</span> I will work on myself to be the partner you deserve.</li>
+        <li data-check><span class="checkmark">✔</span> I will cherish every moment with you.</li>
+      </ul>
+
+      <div class="progress-wrap" aria-label="Promise progress">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+
+      <button id="commitBtn" class="glow-btn">I Will Do Better</button>
+      <button class="next-btn" data-next="forgiveness">Continue</button>
+    </main>
+  </div>
+
+  <!-- Forgiveness Page -->
+  <div id="forgiveness" class="page">
+    <main class="forgiveness">
+      <h1>Will You Forgive Me?</h1>
+      <button id="forgiveBtn" class="heart-btn">Forgive Me 💖</button>
+      <div id="thankYouMsg" class="hidden">Thank you for giving me another chance. I love you endlessly. ❤️</div>
+    </main>
+  </div>
+
+  <!-- Final Page -->
+  <div id="final" class="page">
+    <main class="final">
+      <h1>For You</h1>
+      <p>No matter what, I choose you. Forever and always.</p>
+      <p>Thank you for your love and patience. Let's build a beautiful future together.</p>
+      <div class="fade-out" id="fadeOut"></div>
+    </main>
+  </div>
+
+  <div class="heartbeat" id="heartbeat" aria-hidden="true"></div>
+
+  <script>
+    // ========= Helpers =========
+    const pages = Array.from(document.querySelectorAll(".page"));
+    const heartsContainer = document.getElementById("heartsContainer");
+
+    let currentPage = "landing";
+    let soundEnabled = false;
+
+    // Web Audio heartbeat "thump"
+    let audioContext = null;
+
+    function ensureAudioContext() {
+      if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioContext.state === "suspended") audioContext.resume();
+    }
+
+    function playHeartbeatSound() {
+      if (!soundEnabled) return;
+      try {
+        ensureAudioContext();
+
+        const now = audioContext.currentTime;
+
+        // Two quick thumps to feel like a heartbeat
+        const thump = (t, freq) => {
+          const osc = audioContext.createOscillator();
+          const gain = audioContext.createGain();
+          osc.type = "sine";
+          osc.frequency.setValueAtTime(freq, t);
+          gain.gain.setValueAtTime(0.0001, t);
+          gain.gain.exponentialRampToValueAtTime(0.25, t + 0.01);
+          gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.12);
+          osc.connect(gain);
+          gain.connect(audioContext.destination);
+          osc.start(t);
+          osc.stop(t + 0.14);
+        };
+
+        thump(now, 110);
+        thump(now + 0.16, 90);
+      } catch (e) {
+        // If audio fails (browser policy), silently ignore.
+      }
+    }
+
+    function showTogglesFor(pageId) {
+      const soundToggle = document.getElementById("soundToggle");
+      // Only show sound toggle on apology page (heartbeat)
+      if (pageId === "apology") {
+        soundToggle.style.display = "inline-block";
+      } else {
+        soundToggle.style.display = "none";
+      }
+    }
+
+    function showPage(pageId) {
+      pages.forEach(p => p.classList.remove("active"));
+      const next = document.getElementById(pageId);
+      if (!next) return;
+
+      next.classList.add("active");
+      currentPage = pageId;
+
+      // page-specific behavior
+      showTogglesFor(pageId);
+
+      if (pageId === "story") animateInView(); // animate timeline items
+      if (pageId === "understanding") animateInView(); // animate sections
+      if (pageId === "apology") startLetterReveal(); // reveal text
+      if (pageId === "promise") resetPromisesUI(); // reset checkmarks/progress
+      if (pageId === "final") finalFade();
+    }
+
+    // ========= Landing animations =========
+    const animatedTextEl = document.getElementById("animatedText");
+    const landingText = "I’m Sorry, My Love";
+
+    function typeText(text, el, speed = 70) {
+      el.textContent = "";
+      let i = 0;
+      const timer = setInterval(() => {
+        el.textContent += text[i++];
+        if (i >= text.length) clearInterval(timer);
+      }, speed);
+    }
+
+    function spawnHeart() {
+      const heart = document.createElement("div");
+      heart.className = "heart";
+      heart.textContent = Math.random() > 0.5 ? "❤️" : "💗";
+      const x = Math.random() * window.innerWidth;
+      const y = window.innerHeight - 120 + Math.random() * 40;
+      heart.style.left = x + "px";
+      heart.style.top = y + "px";
+      heart.style.fontSize = (18 + Math.random() * 18) + "px";
+      heartsContainer.appendChild(heart);
+      setTimeout(() => heart.remove(), 5200);
+    }
+
+    // ========= Scroll/animate sections =========
+    function animateInView() {
+      const animatables = document.querySelectorAll(".page.active [data-animate]");
+      // trigger with a small stagger
+      animatables.forEach((el, idx) => {
+        el.classList.remove("animate");
+        setTimeout(() => el.classList.add("animate"), 120 * idx);
+      });
+    }
+
+    // ========= Apology letter reveal =========
+    let letterTimer = null;
+    function startLetterReveal() {
+      const heartbeat = document.getElementById("heartbeat");
+      const paras = Array.from(document.querySelectorAll("#apology [data-reveal]"));
+
+      // reset
+      paras.forEach(p => p.classList.remove("reveal"));
+      heartbeat.style.display = "block";
+
+      // reveal one by one
+      let i = 0;
+      clearInterval(letterTimer);
+      letterTimer = setInterval(() => {
+        if (i < paras.length) {
+          paras[i].classList.add("reveal");
+          playHeartbeatSound();
+          i++;
+        } else {
+          clearInterval(letterTimer);
+        }
+      }, 650);
+    }
+
+    // Stop heartbeat visual when leaving apology
+    function updateHeartbeatVisibility() {
+      const heartbeat = document.getElementById("heartbeat");
+      heartbeat.style.display = (currentPage === "apology") ? "block" : "none";
+    }
+
+    // ========= Promises interaction =========
+    function resetPromisesUI() {
+      const items = Array.from(document.querySelectorAll("#promise [data-check]"));
+      const progressBar = document.getElementById("progressBar");
+      items.forEach(li => li.querySelector(".checkmark").style.opacity = 0);
+      progressBar.style.width = "0%";
+    }
+
+    function commitPromises() {
+      const items = Array.from(document.querySelectorAll("#promise [data-check]"));
+      const progressBar = document.getElementById("progressBar");
+      items.forEach((li, idx) => {
+        setTimeout(() => {
+          li.querySelector(".checkmark").style.opacity = 1;
+          progressBar.style.width = ((idx + 1) / items.length) * 100 + "%";
+        }, 350 * idx);
+      });
+    }
+
+    // ========= Forgiveness effects =========
+    function explodeHeartsAndConfetti() {
+      // exploding hearts around center
+      for (let i = 0; i < 10; i++) {
+        const h = document.createElement("div");
+        h.className = "exploding-heart";
+        h.textContent = Math.random() > 0.5 ? "💖" : "❤️";
+        h.style.left = (window.innerWidth / 2 + (Math.random() * 240 - 120)) + "px";
+        h.style.top = (window.innerHeight / 2 + (Math.random() * 160 - 80)) + "px";
+        document.body.appendChild(h);
+        setTimeout(() => h.remove(), 1700);
+      }
+
+      // confetti rain
+      for (let i = 0; i < 70; i++) {
+        const c = document.createElement("div");
+        c.className = "confetti";
+        c.style.left = (Math.random() * window.innerWidth) + "px";
+        c.style.width = (6 + Math.random() * 8) + "px";
+        c.style.height = (6 + Math.random() * 8) + "px";
+        c.style.opacity = (0.6 + Math.random() * 0.4);
+        c.style.animationDelay = (Math.random() * 0.4) + "s";
+        document.body.appendChild(c);
+        setTimeout(() => c.remove(), 3000);
+      }
+    }
+
+    // ========= Final fade =========
+    function finalFade() {
+      const fade = document.getElementById("fadeOut");
+      fade.style.opacity = "0";
+      setTimeout(() => { fade.style.opacity = "1"; }, 3000);
+      // then keep it subtle; you can remove if you don't want fade
+    }
+
+    // ========= Events =========
+    document.getElementById("themeToggle").addEventListener("click", () => {
+      document.body.classList.toggle("dark-mode");
+      document.getElementById("themeToggle").textContent =
+        document.body.classList.contains("dark-mode") ? "☀️" : "🌙";
+    });
+
+    document.getElementById("soundToggle").addEventListener("click", () => {
+      soundEnabled = !soundEnabled;
+      // show "muted" icon when OFF
+      document.getElementById("soundToggle").textContent = soundEnabled ? "🔊" : "🔇";
+      if (soundEnabled) ensureAudioContext();
+    });
+
+    document.getElementById("startBtn").addEventListener("click", () => {
+      showPage("story");
+      updateHeartbeatVisibility();
+    });
+
+    // Next buttons
+    document.querySelectorAll("[data-next]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const nextId = btn.getAttribute("data-next");
+        showPage(nextId);
+        updateHeartbeatVisibility();
+      });
+    });
+
+    document.getElementById("commitBtn").addEventListener("click", () => {
+      commitPromises();
+    });
+
+    document.getElementById("forgiveBtn").addEventListener("click", () => {
+      const msg = document.getElementById("thankYouMsg");
+      msg.classList.add("show");
+      explodeHeartsAndConfetti();
+
+      // go to final after a moment
+      setTimeout(() => {
+        showPage("final");
+        updateHeartbeatVisibility();
+      }, 3000);
+    });
+
+    // ========= Init =========
+    typeText(landingText, animatedTextEl, 70);
+
+    // Floating hearts continuously on landing
+    let heartInterval = setInterval(() => {
+  if (currentPage === "landing") {
+    for (let i = 0; i < 5; i++) spawnHeart(); // spawn 5 hearts each interval
+  }
+}, 1800);
+
+    // Keep heartbeat hidden unless on apology
+    updateHeartbeatVisibility();
+
+    // Nice: animate sections when page shown (also on first open story via Start)
+    // Already handled in showPage()
+
+  </script>
+</body>
+</html>
